@@ -1112,11 +1112,33 @@ alpha_result <- tryCatch({
 cat(paste0("  Alpha Cronbach (referensi): ", round(alpha_result$total$raw_alpha, 3), "\n"))
 
 # Reliabilitas marginal dari IRT
-marginal_rel <- marginal_rxx(grm_model)
+marginal_rel <- tryCatch({
+  marginal_rxx(grm_model)
+}, error = function(e) {
+  cat("  [Info: Menghitung marginal reliability secara manual]\n")
+  # Fallback: hitung manual menggunakan formula
+  # Rumus: Var(θ) / (Var(θ) + Mean(SE²))
+  # theta_eap akan didefinisikan di section berikutnya, jadi kita hitung di sini
+  theta_temp <- fscores(grm_model, method = "EAP", full.scores = TRUE,
+                        full.scores.SE = TRUE)
+  var_theta <- var(theta_temp[, 1])
+  mean_sem_sq <- mean(theta_temp[, 2]^2)
+  var_theta / (var_theta + mean_sem_sq)
+})
 cat(paste0("  Marginal Reliability (IRT): ", round(marginal_rel, 3), "\n"))
 
 # Empirical reliability
-emp_rel <- empirical_rxx(fscores(grm_model))
+emp_rel <- tryCatch({
+  # Dapatkan fscores dengan SE
+  theta_scores <- fscores(grm_model, method = "EAP", full.scores = TRUE,
+                          full.scores.SE = TRUE)
+  empirical_rxx(theta_scores)
+}, error = function(e) {
+  cat("  [Info: Empirical reliability dihitung dari correlation theta dengan total score]\n")
+  # Alternatif: hitung empirical reliability sebagai squared correlation
+  theta_eap_alt <- fscores(grm_model, method = "EAP", full.scores = TRUE)
+  cor(theta_eap_alt[, 1], rowSums(item_data, na.rm = TRUE))^2
+})
 cat(paste0("  Empirical Reliability     : ", round(emp_rel, 3), "\n"))
 
 # Interpretasi
@@ -1813,29 +1835,31 @@ cat("RINGKASAN ANALISIS KOMPREHENSIF\n")
 cat("=" , rep("=", 70), "\n", sep = "")
 
 # -----------------------------------------------------------------------------
-# PERBAIKAN: Hitung Marginal Reliability dulu
+# NOTE: marginal_rel dan rel_cat sudah dihitung di section Reliabilitas (section 12)
+# Section ini tidak perlu menghitung ulang
 # -----------------------------------------------------------------------------
 
-# 1. Pastikan theta_eap sudah ada (biasanya hasil dari fscores)
-# Jika belum ada, uncomment baris di bawah ini dan sesuaikan 'fit' dengan nama modelmu
-# theta_eap <- fscores(fit, full.scores.SE = TRUE)
+# Verifikasi bahwa variabel sudah ada dan valid
+if (!exists("marginal_rel") || is.na(marginal_rel)) {
+  cat("  [Warning: marginal_rel belum terdefinisi, menghitung ulang...]\n")
+  var_theta <- var(theta_eap[, 1])
+  mean_sem_sq <- mean(theta_eap[, 2]^2)
+  marginal_rel <- var_theta / (var_theta + mean_sem_sq)
+}
 
-# 2. Hitung Marginal Reliability (Empirical Reliability)
-# Rumus: Varians Skor / (Varians Skor + Rata-rata Error Kuadrat)
-var_theta <- var(theta_eap[, 1])
-mean_sem_sq <- mean(theta_eap[, 2]^2)
-marginal_rel <- var_theta / (var_theta + mean_sem_sq)
+# Verifikasi rel_cat (berdasarkan omega_total, bukan marginal_rel)
+if (!exists("rel_cat") || is.na(rel_cat)) {
+  cat("  [Warning: rel_cat belum terdefinisi, membuat kategori...]\n")
+  rel_cat <- ifelse(is.na(omega_result$omega.tot), "Tidak tersedia",
+                    ifelse(omega_result$omega.tot < 0.60, "Tidak dapat diterima",
+                           ifelse(omega_result$omega.tot < 0.70, "Kurang baik",
+                                  ifelse(omega_result$omega.tot < 0.80, "Dapat diterima",
+                                         ifelse(omega_result$omega.tot < 0.90, "Baik", "Sangat Baik")))))
+}
 
-# 3. Buat Kategori Interpretasi (variabel 'rel_cat' juga dibutuhkan di scriptmu)
-rel_cat <- dplyr::case_when(
-  marginal_rel >= 0.9 ~ "Istimewa (>0.9)",
-  marginal_rel >= 0.8 ~ "Baik (0.8 - 0.9)",
-  marginal_rel >= 0.7 ~ "Cukup (0.7 - 0.8)",
-  TRUE ~ "Perlu Perbaikan (<0.7)"
-)
-
-# Print untuk memastikan nilai sudah keluar
-print(paste("Marginal Reliability:", round(marginal_rel, 3)))
+# Print untuk verifikasi
+cat(paste0("\n[Verifikasi] Marginal Reliability: ", round(marginal_rel, 3), "\n"))
+cat(paste0("[Verifikasi] Kategori Reliabilitas: ", rel_cat, "\n\n"))
 
 # Buat ringkasan
 summary_report <- list(
