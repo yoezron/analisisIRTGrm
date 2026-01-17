@@ -77,7 +77,7 @@ cat("Semua package berhasil dimuat!\n\n")
 # -----------------------------------------------------------------------------
 
 # Konfigurasi file
-DATA_FILE <- "data_instrumen_anda.csv"
+DATA_FILE <- "data_skala.csv"
 OUTPUT_DIR <- "output_analisis_psikometrik"
 PLOT_DIR <- paste0(OUTPUT_DIR, "/plots")
 
@@ -88,8 +88,8 @@ if (!dir.exists(PLOT_DIR)) dir.create(PLOT_DIR, recursive = TRUE)
 # Konfigurasi skala
 MIN_SCALE <- 1
 MAX_SCALE <- 5
-SCALE_LABELS <- c("Sangat Tidak Setuju", "Tidak Setuju", "Netral",
-                  "Setuju", "Sangat Setuju")
+SCALE_LABELS <- c("Sangat Tidak Sesuai", "Tidak Sesuai", "Netral",
+                  "Sesuai", "Sangat Sesuai")
 
 # Konfigurasi plot
 PLOT_WIDTH <- 10
@@ -1774,6 +1774,31 @@ cat("\n")
 cat("=" , rep("=", 70), "\n", sep = "")
 cat("RINGKASAN ANALISIS KOMPREHENSIF\n")
 cat("=" , rep("=", 70), "\n", sep = "")
+
+# -----------------------------------------------------------------------------
+# PERBAIKAN: Hitung Marginal Reliability dulu
+# -----------------------------------------------------------------------------
+
+# 1. Pastikan theta_eap sudah ada (biasanya hasil dari fscores)
+# Jika belum ada, uncomment baris di bawah ini dan sesuaikan 'fit' dengan nama modelmu
+# theta_eap <- fscores(fit, full.scores.SE = TRUE)
+
+# 2. Hitung Marginal Reliability (Empirical Reliability)
+# Rumus: Varians Skor / (Varians Skor + Rata-rata Error Kuadrat)
+var_theta <- var(theta_eap[, 1])
+mean_sem_sq <- mean(theta_eap[, 2]^2)
+marginal_rel <- var_theta / (var_theta + mean_sem_sq)
+
+# 3. Buat Kategori Interpretasi (variabel 'rel_cat' juga dibutuhkan di scriptmu)
+rel_cat <- dplyr::case_when(
+  marginal_rel >= 0.9 ~ "Istimewa (>0.9)",
+  marginal_rel >= 0.8 ~ "Baik (0.8 - 0.9)",
+  marginal_rel >= 0.7 ~ "Cukup (0.7 - 0.8)",
+  TRUE ~ "Perlu Perbaikan (<0.7)"
+)
+
+# Print untuk memastikan nilai sudah keluar
+print(paste("Marginal Reliability:", round(marginal_rel, 3)))
 
 # Buat ringkasan
 summary_report <- list(
