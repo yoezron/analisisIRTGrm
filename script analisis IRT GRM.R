@@ -1070,15 +1070,45 @@ cat("=" , rep("=", 70), "\n", sep = "")
 cat("ANALISIS RELIABILITAS (OMEGA)\n")
 cat("=" , rep("=", 70), "\n", sep = "")
 
-# Hitung omega
-omega_result <- omega(item_data, nfactors = 1, fm = "ml", poly = TRUE)
+# Hitung omega dengan error handling
+omega_result <- tryCatch({
+  suppressWarnings({
+    omega(item_data, nfactors = 1, fm = "ml", poly = TRUE, plot = FALSE)
+  })
+}, error = function(e) {
+  cat("  [Error pada omega(), menggunakan estimasi alternatif]\n")
+  # Fallback: gunakan omega tanpa polychoric
+  tryCatch({
+    omega(item_data, nfactors = 1, fm = "ml", poly = FALSE, plot = FALSE)
+  }, error = function(e2) {
+    # Jika masih error, return nilai default
+    list(omega.tot = NA, omega_h = NA)
+  })
+})
 
 cat("\nHasil Analisis Omega:\n")
 cat(paste0("  Omega Total (ω_t)      : ", round(omega_result$omega.tot, 3), "\n"))
 cat(paste0("  Omega Hierarchical (ω_h): ", round(omega_result$omega_h, 3), "\n"))
 
 # Alpha untuk perbandingan (meskipun tidak direkomendasikan)
-alpha_result <- alpha(item_data)
+# Gunakan tryCatch untuk menangani error potential dari alpha()
+alpha_result <- tryCatch({
+  # Coba dengan check.keys=FALSE untuk menghindari plotting issues
+  alpha(item_data, check.keys = FALSE)
+}, error = function(e) {
+  # Jika error, hitung manual menggunakan formula Cronbach's alpha
+  cat("  [Info: Menghitung alpha secara manual karena error pada fungsi alpha()]\n")
+
+  # Formula: α = (k/(k-1)) * (1 - Σσ²ᵢ/σ²ₜ)
+  k <- ncol(item_data)
+  item_var <- apply(item_data, 2, var, na.rm = TRUE)
+  total_var <- var(rowSums(item_data, na.rm = TRUE), na.rm = TRUE)
+  alpha_manual <- (k / (k - 1)) * (1 - sum(item_var) / total_var)
+
+  # Return struktur yang mirip dengan alpha()
+  list(total = list(raw_alpha = alpha_manual))
+})
+
 cat(paste0("  Alpha Cronbach (referensi): ", round(alpha_result$total$raw_alpha, 3), "\n"))
 
 # Reliabilitas marginal dari IRT
@@ -1097,10 +1127,11 @@ cat("  0.70-0.80 : Dapat diterima\n")
 cat("  0.80-0.90 : Baik\n")
 cat("  ω > 0.90  : Sangat Baik\n")
 
-rel_cat <- ifelse(omega_result$omega.tot < 0.60, "Tidak dapat diterima",
-                  ifelse(omega_result$omega.tot < 0.70, "Kurang baik",
-                         ifelse(omega_result$omega.tot < 0.80, "Dapat diterima",
-                                ifelse(omega_result$omega.tot < 0.90, "Baik", "Sangat Baik"))))
+rel_cat <- ifelse(is.na(omega_result$omega.tot), "Tidak tersedia",
+                  ifelse(omega_result$omega.tot < 0.60, "Tidak dapat diterima",
+                         ifelse(omega_result$omega.tot < 0.70, "Kurang baik",
+                                ifelse(omega_result$omega.tot < 0.80, "Dapat diterima",
+                                       ifelse(omega_result$omega.tot < 0.90, "Baik", "Sangat Baik")))))
 cat(paste0("\nKategori Reliabilitas: ", rel_cat, "\n"))
 
 # Simpan hasil reliabilitas
