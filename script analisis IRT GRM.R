@@ -869,9 +869,10 @@ theta_range <- seq(-4, 4, by = 0.1)
 # --- PLOT 14: ICC Grid (semua item) ---
 png(paste0(PLOT_DIR, "/14_icc_all_items.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "trace", which.items = 1:n_items,
+p <- plot(grm_model, type = "trace", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Item Characteristic Curves (ICC) - All Items")
+print(p)
 dev.off()
 cat("\nPlot 14 tersimpan: 14_icc_all_items.png\n")
 
@@ -879,9 +880,10 @@ cat("\nPlot 14 tersimpan: 14_icc_all_items.png\n")
 for (i in 1:n_items) {
   png(paste0(PLOT_DIR, "/14_icc_item_", i, ".png"),
       width = PLOT_WIDTH, height = PLOT_HEIGHT, units = "in", res = PLOT_DPI)
-  plot(grm_model, type = "trace", which.items = i,
+  p <- plot(grm_model, type = "trace", which.items = i,
        theta_lim = c(-4, 4),
        main = paste0("ICC - ", item_names[i]))
+  print(p)
   dev.off()
 }
 cat(paste0("Plot ICC individual tersimpan: 14_icc_item_1.png sampai 14_icc_item_", n_items, ".png\n"))
@@ -889,9 +891,10 @@ cat(paste0("Plot ICC individual tersimpan: 14_icc_item_1.png sampai 14_icc_item_
 # --- PLOT 15: Category Response Curves ---
 png(paste0(PLOT_DIR, "/15_category_response_curves.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "trace", which.items = 1:min(6, n_items),
+p <- plot(grm_model, type = "trace", which.items = 1:min(6, n_items),
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Category Response Curves (6 Item Pertama)")
+print(p)
 dev.off()
 cat("Plot 15 tersimpan: 15_category_response_curves.png\n")
 
@@ -959,9 +962,10 @@ cat("\nPlot 16 tersimpan: 16_iif_all_items.png\n")
 # --- PLOT 17: IIF Individual ---
 png(paste0(PLOT_DIR, "/17_iif_individual.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "infotrace", which.items = 1:n_items,
+p <- plot(grm_model, type = "infotrace", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Item Information Functions (Individual)")
+print(p)
 dev.off()
 cat("Plot 17 tersimpan: 17_iif_individual.png\n")
 
@@ -1687,17 +1691,19 @@ cat("=" , rep("=", 70), "\n", sep = "")
 # --- PLOT 26: Expected Score Curve (Test) ---
 png(paste0(PLOT_DIR, "/26_expected_score_curve.png"),
     width = PLOT_WIDTH, height = PLOT_HEIGHT, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "score", theta_lim = c(-4, 4),
+p <- plot(grm_model, type = "score", theta_lim = c(-4, 4),
      main = "Test Expected Score Curve")
+print(p)
 dev.off()
 cat("\nPlot 26 tersimpan: 26_expected_score_curve.png\n")
 
 # --- PLOT 27: Expected Score per Item ---
 png(paste0(PLOT_DIR, "/27_expected_score_items.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "itemscore", which.items = 1:n_items,
+p <- plot(grm_model, type = "itemscore", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Expected Score per Item")
+print(p)
 dev.off()
 cat("Plot 27 tersimpan: 27_expected_score_items.png\n")
 
@@ -1938,6 +1944,403 @@ cat(paste0("   - Rentang Percentile: ", summary_report$norming$percentile_range,
 # Simpan ringkasan
 saveRDS(summary_report, paste0(OUTPUT_DIR, "/20_summary_report.rds"))
 
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# Export Resume Hasil Analisis ke File TXT
+# -----------------------------------------------------------------------------
+
+cat("=" , rep("=", 70), "\n", sep = "")
+cat("EXPORT RESUME HASIL ANALISIS\n")
+cat("=" , rep("=", 70), "\n", sep = "")
+
+# Buat file teks resume
+resume_file <- paste0(OUTPUT_DIR, "/00_RESUME_HASIL_ANALISIS.txt")
+
+# Fungsi untuk membuat garis pembatas
+make_line <- function(char = "=", length = 80) {
+  paste(rep(char, length), collapse = "")
+}
+
+# Tulis resume ke file
+cat("Membuat file resume hasil analisis...\n")
+sink(resume_file)
+
+# Header
+cat(make_line("="), "\n")
+cat("        RESUME HASIL ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN\n")
+cat("            DENGAN PENDEKATAN ITEM RESPONSE THEORY (IRT)\n")
+cat("                    GRADED RESPONSE MODEL (GRM)\n")
+cat(make_line("="), "\n")
+cat("Tanggal Analisis:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+cat("File Data       :", DATA_FILE, "\n")
+cat(make_line("="), "\n\n")
+
+# 1. INFORMASI DATA
+cat(make_line("-"), "\n")
+cat("1. INFORMASI DATA\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Jumlah Item       : %d item\n", summary_report$data_info$n_items))
+cat(sprintf("   Jumlah Responden  : %d responden\n", summary_report$data_info$n_respondents))
+cat(sprintf("   Rentang Skala     : %s\n", summary_report$data_info$scale_range))
+cat("\n")
+
+# 2. STATISTIK DESKRIPTIF
+cat(make_line("-"), "\n")
+cat("2. STATISTIK DESKRIPTIF\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Mean Skor Total   : %.2f\n", summary_report$descriptive$mean_total))
+cat(sprintf("   SD Skor Total     : %.2f\n", summary_report$descriptive$sd_total))
+cat(sprintf("   Rentang Mean Item : %.2f - %.2f\n",
+    summary_report$descriptive$min_item_mean,
+    summary_report$descriptive$max_item_mean))
+cat("\n")
+cat("   Interpretasi:\n")
+cat(sprintf("   - Rata-rata responden mendapat skor %.2f dari maksimal %d\n",
+    summary_report$descriptive$mean_total, summary_report$data_info$n_items * MAX_SCALE))
+cat(sprintf("   - Variabilitas skor cukup (SD = %.2f)\n", summary_report$descriptive$sd_total))
+cat("\n")
+
+# 3. KORELASI ANTAR ITEM
+cat(make_line("-"), "\n")
+cat("3. KORELASI ANTAR ITEM\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Range Korelasi    : %.3f - %.3f\n", min(cor_values), max(cor_values)))
+cat(sprintf("   Mean Korelasi     : %.3f\n", mean(cor_values)))
+cat(sprintf("   SD Korelasi       : %.3f\n", sd(cor_values)))
+cat("\n")
+cat("   Item-Total Correlation:\n")
+for (i in 1:min(5, length(item_total_cor))) {
+  cat(sprintf("   - %-15s: r = %.3f\n", names(item_total_cor)[i], item_total_cor[i]))
+}
+if (length(item_total_cor) > 5) {
+  cat(sprintf("   ... dan %d item lainnya (lihat file CSV)\n", length(item_total_cor) - 5))
+}
+cat("\n")
+cat("   Interpretasi:\n")
+cat("   - Korelasi positif menunjukkan konsistensi internal yang baik\n")
+cat("   - Item dengan r < 0.30 perlu dievaluasi lebih lanjut\n")
+cat("\n")
+
+# 4. UJI ASUMSI UNIDIMENSIONALITAS
+cat(make_line("-"), "\n")
+cat("4. UJI ASUMSI UNIDIMENSIONALITAS\n")
+cat(make_line("-"), "\n")
+cat("   Parallel Analysis:\n")
+cat(sprintf("   - Faktor Disarankan   : %d faktor\n", summary_report$unidimensionality$suggested_factors))
+cat(sprintf("   - Variance Explained  : %.2f%%\n", summary_report$unidimensionality$variance_explained))
+cat("\n")
+cat("   Confirmatory Factor Analysis (CFA):\n")
+cat(sprintf("   - CFI                 : %.3f (kriteria >= 0.90)\n", summary_report$unidimensionality$cfa_cfi))
+cat(sprintf("   - RMSEA               : %.3f (kriteria < 0.08)\n", summary_report$unidimensionality$cfa_rmsea))
+cat("\n")
+cat(sprintf("   Kesimpulan            : %s\n", summary_report$unidimensionality$conclusion))
+cat("\n")
+cat("   Interpretasi:\n")
+if (summary_report$unidimensionality$conclusion == "Terpenuhi") {
+  cat("   - Asumsi unidimensionalitas terpenuhi\n")
+  cat("   - Data cocok untuk analisis IRT dengan model unidimensional\n")
+} else {
+  cat("   - Asumsi unidimensionalitas perlu perhatian\n")
+  cat("   - Pertimbangkan model multidimensional atau revisi instrumen\n")
+}
+cat("\n")
+
+# 5. RELIABILITAS
+cat(make_line("-"), "\n")
+cat("5. RELIABILITAS INSTRUMEN\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Omega Total (ω_t)         : %.3f\n", summary_report$reliability$omega_total))
+cat(sprintf("   Omega Hierarchical (ω_h)  : %.3f\n", summary_report$reliability$omega_hierarchical))
+cat(sprintf("   Marginal Reliability (IRT): %.3f\n", summary_report$reliability$marginal_reliability))
+cat("\n")
+cat(sprintf("   Kategori                  : %s\n", summary_report$reliability$interpretation))
+cat("\n")
+cat("   Kriteria Interpretasi:\n")
+cat("   - ω < 0.60  : Tidak dapat diterima\n")
+cat("   - 0.60-0.70 : Kurang baik\n")
+cat("   - 0.70-0.80 : Dapat diterima\n")
+cat("   - 0.80-0.90 : Baik\n")
+cat("   - ω > 0.90  : Sangat Baik (Istimewa)\n")
+cat("\n")
+cat("   Interpretasi:\n")
+if (summary_report$reliability$omega_total >= 0.80) {
+  cat("   - Instrumen memiliki reliabilitas yang baik\n")
+  cat("   - Konsistensi internal tinggi, hasil pengukuran dapat dipercaya\n")
+} else if (summary_report$reliability$omega_total >= 0.70) {
+  cat("   - Instrumen memiliki reliabilitas yang dapat diterima\n")
+  cat("   - Masih ada ruang untuk perbaikan\n")
+} else {
+  cat("   - Reliabilitas instrumen perlu ditingkatkan\n")
+  cat("   - Pertimbangkan revisi item atau penambahan item\n")
+}
+cat("\n")
+
+# 6. MODEL FIT GRM
+cat(make_line("-"), "\n")
+cat("6. KETEPATAN MODEL (MODEL FIT) - GRM\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   M2 RMSEA  : %.4f (kriteria < 0.08)\n", summary_report$model_fit$m2_rmsea))
+cat(sprintf("   M2 CFI    : %.3f (kriteria >= 0.95)\n", summary_report$model_fit$m2_cfi))
+cat(sprintf("   SRMSR     : %.4f (kriteria < 0.08)\n", summary_report$model_fit$m2_srmsr))
+cat("\n")
+cat(sprintf("   Kesimpulan: %s\n", summary_report$model_fit$conclusion))
+cat("\n")
+cat("   Interpretasi:\n")
+if (summary_report$model_fit$conclusion == "Model fit baik") {
+  cat("   - Model GRM sesuai dengan data empiris\n")
+  cat("   - Estimasi parameter dapat dipercaya\n")
+} else {
+  cat("   - Model fit perlu perhatian\n")
+  cat("   - Evaluasi item-level fit untuk identifikasi masalah spesifik\n")
+}
+cat("\n")
+
+# 7. PARAMETER ITEM - DISKRIMINASI
+cat(make_line("-"), "\n")
+cat("7. PARAMETER DISKRIMINASI ITEM (a)\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Mean  : %.2f\n", summary_report$item_params$mean_discrimination))
+cat(sprintf("   SD    : %.2f\n", summary_report$item_params$sd_discrimination))
+cat(sprintf("   Range : %.2f - %.2f\n",
+    summary_report$item_params$min_discrimination,
+    summary_report$item_params$max_discrimination))
+cat("\n")
+cat("   Kriteria Interpretasi:\n")
+cat("   - a < 0.5  : Sangat Rendah (item lemah)\n")
+cat("   - 0.5-0.9  : Rendah\n")
+cat("   - 0.9-1.3  : Sedang\n")
+cat("   - 1.3-1.7  : Tinggi\n")
+cat("   - a > 1.7  : Sangat Tinggi (item sangat diskriminatif)\n")
+cat("\n")
+cat("   Distribusi Kategori Diskriminasi:\n")
+discrim_table <- table(discrim_cat)
+for (i in 1:length(discrim_table)) {
+  cat(sprintf("   - %-15s: %d item\n", names(discrim_table)[i], discrim_table[i]))
+}
+cat("\n")
+cat("   Top 5 Item Diskriminasi Tertinggi:\n")
+top_discrim <- head(param_df[order(-param_df$a), ], 5)
+for (i in 1:nrow(top_discrim)) {
+  cat(sprintf("   %d. %-15s: a = %.3f\n", i, top_discrim$Item[i], top_discrim$a[i]))
+}
+cat("\n")
+cat("   Interpretasi:\n")
+cat("   - Parameter 'a' menunjukkan kemampuan item membedakan responden\n")
+cat("   - Item dengan a tinggi lebih berguna untuk pengukuran yang presisi\n")
+if (summary_report$item_params$mean_discrimination >= 1.0) {
+  cat("   - Secara rata-rata, item memiliki daya diskriminasi yang baik\n")
+} else {
+  cat("   - Pertimbangkan revisi item dengan diskriminasi rendah\n")
+}
+cat("\n")
+
+# 8. ITEM FIT
+cat(make_line("-"), "\n")
+cat("8. KESESUAIAN ITEM (ITEM FIT)\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Jumlah Item Misfit: %d item\n", summary_report$item_fit$n_misfit))
+if (summary_report$item_fit$misfit_items != "") {
+  cat(sprintf("   Item Misfit       : %s\n", summary_report$item_fit$misfit_items))
+} else {
+  cat("   Item Misfit       : Tidak ada\n")
+}
+cat("\n")
+cat("   Interpretasi:\n")
+if (summary_report$item_fit$n_misfit == 0) {
+  cat("   - Semua item fit dengan model GRM\n")
+  cat("   - Tidak ada item yang perlu revisi dari perspektif fit\n")
+} else {
+  cat("   - Item misfit menunjukkan pola respons yang tidak sesuai model\n")
+  cat("   - Evaluasi lebih lanjut diperlukan untuk item tersebut\n")
+  cat("   - Pertimbangkan revisi atau penghapusan item misfit\n")
+}
+cat("\n")
+
+# 9. TEST INFORMATION FUNCTION
+cat(make_line("-"), "\n")
+cat("9. FUNGSI INFORMASI TES (TEST INFORMATION)\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Informasi Maksimum : %.2f\n", summary_report$test_info$max_information))
+cat(sprintf("   Theta at Max Info  : %.2f\n", summary_report$test_info$theta_at_max))
+cat(sprintf("   Rentang Info Tinggi: %s\n", summary_report$test_info$info_range))
+cat("\n")
+cat("   Interpretasi:\n")
+cat(sprintf("   - Tes paling informatif pada theta = %.2f\n", summary_report$test_info$theta_at_max))
+if (abs(summary_report$test_info$theta_at_max) <= 1.0) {
+  cat("   - Tes cocok untuk mengukur kemampuan rata-rata populasi\n")
+} else if (summary_report$test_info$theta_at_max > 1.0) {
+  cat("   - Tes lebih cocok untuk mengukur individu dengan trait tinggi\n")
+} else {
+  cat("   - Tes lebih cocok untuk mengukur individu dengan trait rendah\n")
+}
+cat(sprintf("   - Informasi tinggi tersebar di rentang %s\n", summary_report$test_info$info_range))
+cat("\n")
+
+# 10. LOCAL INDEPENDENCE
+cat(make_line("-"), "\n")
+cat("10. ASUMSI LOCAL INDEPENDENCE\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Pasangan dengan LD: %d pasangan\n", summary_report$local_independence$n_ld_pairs))
+cat(sprintf("   Kesimpulan        : %s\n", summary_report$local_independence$conclusion))
+cat("\n")
+cat("   Interpretasi:\n")
+if (summary_report$local_independence$n_ld_pairs == 0) {
+  cat("   - Asumsi local independence terpenuhi\n")
+  cat("   - Tidak ada item yang saling tergantung setelah mengontrol trait\n")
+} else {
+  cat("   - Ada pasangan item dengan local dependence (Q3 > 0.20)\n")
+  cat("   - Evaluasi apakah item mengukur subfaktor yang sama\n")
+  cat("   - Pertimbangkan testlet model atau penghapusan salah satu item\n")
+}
+cat("\n")
+
+# 11. PENORMAAN DAN INTERPRETASI SKOR
+cat(make_line("-"), "\n")
+cat("11. PENORMAAN DAN INTERPRETASI SKOR\n")
+cat(make_line("-"), "\n")
+cat(sprintf("   Rentang Theta      : %s\n", summary_report$norming$theta_range))
+cat(sprintf("   Rentang T-Score    : %s\n", summary_report$norming$tscore_range))
+cat(sprintf("   Rentang Percentile : %s\n", summary_report$norming$percentile_range))
+cat("\n")
+cat("   Interpretasi T-Score:\n")
+cat("   - T-Score < 30  : Sangat Rendah\n")
+cat("   - T-Score 30-40 : Rendah\n")
+cat("   - T-Score 40-60 : Rata-rata\n")
+cat("   - T-Score 60-70 : Tinggi\n")
+cat("   - T-Score > 70  : Sangat Tinggi\n")
+cat("\n")
+
+# 12. RINGKASAN KESIMPULAN UMUM
+cat(make_line("="), "\n")
+cat("12. RINGKASAN KESIMPULAN UMUM\n")
+cat(make_line("="), "\n\n")
+
+# Evaluasi keseluruhan
+cat("EVALUASI KUALITAS INSTRUMEN:\n\n")
+
+# Status unidimensionalitas
+cat(sprintf("✓ Unidimensionalitas    : %s\n",
+    ifelse(summary_report$unidimensionality$conclusion == "Terpenuhi", "TERPENUHI", "PERLU PERHATIAN")))
+
+# Status reliabilitas
+cat(sprintf("✓ Reliabilitas          : %s (ω = %.3f)\n",
+    summary_report$reliability$interpretation,
+    summary_report$reliability$omega_total))
+
+# Status model fit
+cat(sprintf("✓ Model Fit GRM         : %s\n",
+    toupper(summary_report$model_fit$conclusion)))
+
+# Status item fit
+cat(sprintf("✓ Item Fit              : %d/%d item fit dengan model\n",
+    summary_report$data_info$n_items - summary_report$item_fit$n_misfit,
+    summary_report$data_info$n_items))
+
+# Status local independence
+cat(sprintf("✓ Local Independence    : %s\n",
+    toupper(summary_report$local_independence$conclusion)))
+
+cat("\n")
+
+# Rekomendasi
+cat(make_line("-"), "\n")
+cat("REKOMENDASI:\n")
+cat(make_line("-"), "\n\n")
+
+recommendations <- c()
+
+if (summary_report$unidimensionality$conclusion != "Terpenuhi") {
+  recommendations <- c(recommendations,
+    "1. Evaluasi struktur faktor instrumen - pertimbangkan model multidimensional")
+}
+
+if (summary_report$reliability$omega_total < 0.80) {
+  recommendations <- c(recommendations,
+    sprintf("%d. Tingkatkan reliabilitas dengan menambah item atau merevisi item lemah",
+            length(recommendations) + 1))
+}
+
+if (summary_report$item_fit$n_misfit > 0) {
+  recommendations <- c(recommendations,
+    sprintf("%d. Evaluasi dan revisi item misfit: %s",
+            length(recommendations) + 1,
+            summary_report$item_fit$misfit_items))
+}
+
+if (summary_report$item_params$min_discrimination < 0.5) {
+  recommendations <- c(recommendations,
+    sprintf("%d. Revisi item dengan diskriminasi sangat rendah (a < 0.5)",
+            length(recommendations) + 1))
+}
+
+if (summary_report$local_independence$n_ld_pairs > 0) {
+  recommendations <- c(recommendations,
+    sprintf("%d. Evaluasi pasangan item dengan local dependence",
+            length(recommendations) + 1))
+}
+
+if (length(recommendations) == 0) {
+  cat("✓ Instrumen memiliki kualitas psikometrik yang baik\n")
+  cat("✓ Tidak ada rekomendasi perbaikan major\n")
+  cat("✓ Instrumen siap digunakan untuk pengukuran\n")
+} else {
+  for (rec in recommendations) {
+    cat(rec, "\n")
+  }
+}
+
+cat("\n")
+
+# Kekuatan instrumen
+cat(make_line("-"), "\n")
+cat("KEKUATAN INSTRUMEN:\n")
+cat(make_line("-"), "\n\n")
+
+strengths <- c()
+
+if (summary_report$reliability$omega_total >= 0.80) {
+  strengths <- c(strengths, "✓ Reliabilitas baik/sangat baik")
+}
+
+if (summary_report$unidimensionality$conclusion == "Terpenuhi") {
+  strengths <- c(strengths, "✓ Struktur unidimensional terkonfirmasi")
+}
+
+if (summary_report$model_fit$conclusion == "Model fit baik") {
+  strengths <- c(strengths, "✓ Model GRM fit dengan data")
+}
+
+if (summary_report$item_fit$n_misfit == 0) {
+  strengths <- c(strengths, "✓ Semua item fit dengan model")
+}
+
+if (summary_report$local_independence$conclusion == "Terpenuhi") {
+  strengths <- c(strengths, "✓ Asumsi local independence terpenuhi")
+}
+
+if (summary_report$item_params$mean_discrimination >= 1.0) {
+  strengths <- c(strengths, "✓ Daya diskriminasi item rata-rata baik")
+}
+
+for (strength in strengths) {
+  cat(strength, "\n")
+}
+
+cat("\n")
+cat(make_line("="), "\n")
+cat("AKHIR RESUME HASIL ANALISIS\n")
+cat(make_line("="), "\n")
+cat("\nCatatan:\n")
+cat("- Untuk detail lengkap, lihat file CSV dan plot yang tersedia\n")
+cat("- File laporan HTML tersedia untuk visualisasi interaktif\n")
+cat("- Semua hasil tersimpan di direktori:", OUTPUT_DIR, "\n")
+cat("\n")
+cat("Timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+
+sink()
+
+cat(paste0("Resume hasil analisis berhasil disimpan: ", resume_file, "\n"))
 cat("\n")
 
 # -----------------------------------------------------------------------------
