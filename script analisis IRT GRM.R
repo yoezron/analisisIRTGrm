@@ -2594,68 +2594,77 @@ cat("=" , rep("=", 70), "\n", sep = "")
 cat("GENERATE LAPORAN\n")
 cat("=" , rep("=", 70), "\n", sep = "")
 
-# Buat file RMarkdown untuk laporan
-rmd_content <- '---
-title: "LAPORAN ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN"
-subtitle: "Pendekatan Item Response Theory - Graded Response Model (IRT-GRM)"
-author: |
-  | **Program Studi Psikologi**
-  | Universitas Muhammadiyah Bandung
-  |
-  | Mata Kuliah: Psikometrika Lanjut
-  | Dosen Pengampu: Isman Rahmani Yusron, M.A
-date: "`r format(Sys.Date(), \'%d %B %Y\')`"
-output:
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
-    toc_depth: 4
-    theme: cosmo
-    highlight: tango
-    code_folding: hide
-    df_print: paged
-    number_sections: true
-    css: |
-      body {
-        font-family: "Segoe UI", Arial, sans-serif;
-        line-height: 1.6;
-      }
-      h1, h2, h3 {
-        color: #2C3E50;
-      }
-      .main-container {
-        max-width: 1400px;
-      }
-      .alert {
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 5px;
-      }
-      .alert-info {
-        background-color: #D9EDF7;
-        border-left: 5px solid #31708F;
-      }
-      .alert-success {
-        background-color: #DFF0D8;
-        border-left: 5px solid #3C763D;
-      }
-      .alert-warning {
-        background-color: #FCF8E3;
-        border-left: 5px solid #8A6D3B;
-      }
----
+# Buat file RMarkdown untuk laporan - menulis langsung ke file untuk menghindari "string too long"
+rmd_file <- paste0(OUTPUT_DIR, "/Laporan_Analisis_Psikometrik.Rmd")
+cat("Membuat file RMarkdown...\n")
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
-                      fig.width = 12, fig.height = 8, dpi = 300)
-library(knitr)
-library(kableExtra)
-library(ggplot2)
-library(dplyr)
-```
+# Tulis YAML header
+writeLines(c(
+  '---',
+  'title: "LAPORAN ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN"',
+  'subtitle: "Pendekatan Item Response Theory - Graded Response Model (IRT-GRM)"',
+  'author: |',
+  '  | **Program Studi Psikologi**',
+  '  | Universitas Muhammadiyah Bandung',
+  '  |',
+  '  | Mata Kuliah: Psikometrika Lanjut',
+  '  | Dosen Pengampu: Isman Rahmani Yusron, M.A',
+  'date: "`r format(Sys.Date(), \'%d %B %Y\')`"',
+  'output:',
+  '  html_document:',
+  '    toc: true',
+  '    toc_float:',
+  '      collapsed: false',
+  '      smooth_scroll: true',
+  '    toc_depth: 4',
+  '    theme: cosmo',
+  '    highlight: tango',
+  '    code_folding: hide',
+  '    df_print: paged',
+  '    number_sections: true',
+  '    css: |',
+  '      body {',
+  '        font-family: "Segoe UI", Arial, sans-serif;',
+  '        line-height: 1.6;',
+  '      }',
+  '      h1, h2, h3 {',
+  '        color: #2C3E50;',
+  '      }',
+  '      .main-container {',
+  '        max-width: 1400px;',
+  '      }',
+  '      .alert {',
+  '        padding: 15px;',
+  '        margin: 20px 0;',
+  '        border-radius: 5px;',
+  '      }',
+  '      .alert-info {',
+  '        background-color: #D9EDF7;',
+  '        border-left: 5px solid #31708F;',
+  '      }',
+  '      .alert-success {',
+  '        background-color: #DFF0D8;',
+  '        border-left: 5px solid #3C763D;',
+  '      }',
+  '      .alert-warning {',
+  '        background-color: #FCF8E3;',
+  '        border-left: 5px solid #8A6D3B;',
+  '      }',
+  '---',
+  '',
+  '```{r setup, include=FALSE}',
+  'knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,',
+  '                      fig.width = 12, fig.height = 8, dpi = 300)',
+  'library(knitr)',
+  'library(kableExtra)',
+  'library(ggplot2)',
+  'library(dplyr)',
+  '```',
+  ''
+), rmd_file)
 
+# Bagian 1: Load data dan intro
+cat('
 ```{r load-data}
 summary_report <- readRDS("20_summary_report.rds")
 ```
@@ -2688,7 +2697,10 @@ Analisis properti psikometrik telah dilakukan terhadap instrumen pengukuran psik
 <strong>RMSEA:</strong> `r summary_report$unidimensionality$cfa_rmsea`<br>
 <strong>Interpretasi:</strong> `r if(summary_report$unidimensionality$conclusion == "Terpenuhi") "Instrumen mengukur satu konstruk laten (unidimensional)" else "Perlu evaluasi lebih lanjut"`
 </div>
+', file = rmd_file, append = TRUE)
 
+# Bagian 2: Alert boxes
+cat('
 <div class="alert alert-`r if(summary_report$reliability$omega_total >= 0.80) "success" else if(summary_report$reliability$omega_total >= 0.70) "warning" else "danger"`">
 <h4>`r if(summary_report$reliability$omega_total >= 0.80) "✅" else if(summary_report$reliability$omega_total >= 0.70) "⚠️" else "❌"` Reliabilitas Instrumen</h4>
 <strong>Omega Total (ω):</strong> `r summary_report$reliability$omega_total`<br>
@@ -2715,7 +2727,10 @@ Analisis properti psikometrik telah dilakukan terhadap instrumen pengukuran psik
 | Local Independence | LD pairs = `r summary_report$local_independence$n_ld_pairs` | `r summary_report$local_independence$conclusion` |
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 3: Deskripsi Data
+cat('
 # 1. Deskripsi Data
 
 ## 1.1 Informasi Umum
@@ -2747,7 +2762,10 @@ kable(desc_stats, digits = 3, caption = "Statistik Deskriptif per Item") %>%
 ![](plots/04_heatmap_distribusi_kategori.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 4: Korelasi
+cat('
 # 2. Analisis Korelasi
 
 ## 2.1 Matriks Korelasi Inter-Item
@@ -2763,7 +2781,10 @@ kable(cor_summary, digits = 3, caption = "Korelasi Item-Total (Corrected)") %>%
 ![](plots/06_korelasi_item_total.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 5: Unidimensionalitas
+cat('
 # 3. Uji Unidimensionalitas
 
 ## 3.1 Parallel Analysis
@@ -2803,7 +2824,10 @@ kable(cfa_loadings, digits = 3, caption = "Standardized Factor Loadings (CFA)") 
 **Kesimpulan**: `r summary_report$unidimensionality$conclusion`
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 6: GRM Parameters
+cat('
 # 4. Graded Response Model (GRM)
 
 ## 4.1 Parameter Item
@@ -2828,7 +2852,10 @@ kable(item_params, digits = 3, caption = "Parameter Item GRM (a = diskriminasi, 
 ![](plots/11_parameter_threshold.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 7: Model Fit
+cat('
 # 5. Evaluasi Model Fit
 
 ## 5.1 Overall Model Fit
@@ -2866,7 +2893,10 @@ kable(person_fit, caption = "Person Fit Summary") %>%
 ![](plots/13_person_fit_distribution.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 8: ICC dan IIF
+cat('
 # 6. Item Characteristic Curves (ICC)
 
 ![](plots/14_icc_all_items.png)
@@ -2886,7 +2916,10 @@ kable(info_summary, digits = 3, caption = "Item Information Summary") %>%
 ![](plots/17_iif_individual.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 9: TIF dan Reliabilitas
+cat('
 # 8. Test Information Function (TIF)
 
 ![](plots/18_test_information_function.png)
@@ -2914,7 +2947,10 @@ kable(reliability, caption = "Reliability Estimates") %>%
 **Kesimpulan**: Reliabilitas instrumen **`r summary_report$reliability$interpretation`** dengan Omega Total = `r summary_report$reliability$omega_total`
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 10: Theta estimation
+cat('
 # 10. Estimasi Theta
 
 ![](plots/22_distribusi_theta.png)
@@ -2924,7 +2960,10 @@ kable(reliability, caption = "Reliability Estimates") %>%
 ![](plots/24_theta_confidence_interval.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 11: Penormaan (dipecah menjadi 2 bagian karena panjang)
+cat('
 # 11. Penormaan Berdasarkan Theta
 
 ## 11.1 Tabel Konversi Skor
@@ -2962,7 +3001,10 @@ dist_kat <- read.csv("24_distribusi_kategori.csv")
 kable(dist_kat, caption = "Distribusi Responden per Kategori") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
 ```
+', file = rmd_file, append = TRUE)
 
+# Bagian 12: Visualisasi Penormaan
+cat('
 ## 11.5 Visualisasi Penormaan
 
 ### Distribusi Theta dengan Kategori
@@ -2990,7 +3032,10 @@ kable(dist_kat, caption = "Distribusi Responden per Kategori") %>%
 ![](plots/35_heatmap_konversi.png)
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 13: Wright Map dan Local Independence
+cat('
 # 12. Wright Map
 
 ![](plots/25b_wright_map_ggplot.png)
@@ -3013,7 +3058,10 @@ kable(round(q3_residuals, 3), caption = "Q3 Residual Correlations") %>%
 **Kesimpulan**: `r summary_report$local_independence$conclusion`
 
 ---
+', file = rmd_file, append = TRUE)
 
+# Bagian 14: Kesimpulan dan Lampiran
+cat('
 # 14. Kesimpulan dan Rekomendasi
 
 ## Kesimpulan
@@ -3029,13 +3077,13 @@ Berdasarkan analisis komprehensif menggunakan Graded Response Model, instrumen i
 
 ```{r results="asis"}
 if (summary_report$item_fit$n_misfit > 0) {
-  cat("- Pertimbangkan untuk mereview item: ", summary_report$item_fit$misfit_items, "\n")
+  cat("- Pertimbangkan untuk mereview item: ", summary_report$item_fit$misfit_items, "\\n")
 }
 if (summary_report$local_independence$n_ld_pairs > 0) {
-  cat("- Terdapat indikasi local dependence yang perlu diinvestigasi lebih lanjut\n")
+  cat("- Terdapat indikasi local dependence yang perlu diinvestigasi lebih lanjut\\n")
 }
 if (summary_report$reliability$omega_total < 0.80) {
-  cat("- Pertimbangkan untuk menambah item guna meningkatkan reliabilitas\n")
+  cat("- Pertimbangkan untuk menambah item guna meningkatkan reliabilitas\\n")
 }
 ```
 
@@ -3078,10 +3126,7 @@ Total 36 visualisasi tersimpan di folder `plots/`
 ---
 
 *Laporan ini dihasilkan secara otomatis menggunakan R Script Analisis Psikometrik GRM*
-'
-
-# Simpan RMarkdown
-writeLines(rmd_content, paste0(OUTPUT_DIR, "/Laporan_Analisis_Psikometrik.Rmd"))
+', file = rmd_file, append = TRUE)
 
 # Render laporan HTML
 cat("\nMembuat laporan HTML...\n")
