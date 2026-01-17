@@ -2089,14 +2089,55 @@ make_line <- function(char = "=", length = 80) {
 cat("Membuat file resume hasil analisis...\n")
 sink(resume_file)
 
-# Header
+# Header Institusi dan Identitas Akademis
 cat(make_line("="), "\n")
-cat("        RESUME HASIL ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN\n")
-cat("            DENGAN PENDEKATAN ITEM RESPONSE THEORY (IRT)\n")
-cat("                    GRADED RESPONSE MODEL (GRM)\n")
 cat(make_line("="), "\n")
-cat("Tanggal Analisis:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
-cat("File Data       :", DATA_FILE, "\n")
+cat("                                                                                \n")
+cat("              LAPORAN HASIL ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN            \n")
+cat("               DENGAN PENDEKATAN ITEM RESPONSE THEORY (IRT)                    \n")
+cat("                      GRADED RESPONSE MODEL (GRM)                              \n")
+cat("                                                                                \n")
+cat(make_line("="), "\n")
+cat(make_line("="), "\n\n")
+
+# Informasi Akademis
+cat(make_line("-"), "\n")
+cat("INFORMASI AKADEMIS\n")
+cat(make_line("-"), "\n")
+cat("Program Studi     : Psikologi\n")
+cat("Universitas       : Universitas Muhammadiyah Bandung\n")
+cat("Mata Kuliah       : Psikometrika Lanjut\n")
+cat("Dosen Pengampu    : Isman Rahmani Yusron, M.A\n")
+cat("Tanggal Analisis  :", format(Sys.time(), "%d %B %Y, %H:%M:%S WIB"), "\n")
+cat(make_line("-"), "\n\n")
+
+# Informasi Teknis
+cat(make_line("-"), "\n")
+cat("INFORMASI TEKNIS\n")
+cat(make_line("-"), "\n")
+cat("File Data         :", DATA_FILE, "\n")
+cat("Metode Analisis   : Item Response Theory (IRT)\n")
+cat("Model IRT         : Graded Response Model (GRM)\n")
+cat("Software          : R Programming Language\n")
+cat("Package Utama     : mirt, psych, lavaan\n")
+cat(make_line("-"), "\n\n\n")
+
+cat(make_line("="), "\n")
+cat("                          RINGKASAN EKSEKUTIF                                  \n")
+cat(make_line("="), "\n\n")
+
+cat("Laporan ini menyajikan hasil analisis komprehensif terhadap properti psikometrik\n")
+cat("instrumen pengukuran menggunakan pendekatan Item Response Theory (IRT) dengan\n")
+cat("Graded Response Model (GRM). Analisis mencakup evaluasi unidimensionalitas,\n")
+cat("reliabilitas, parameter item, ketepatan model, dan norma interpretasi skor.\n\n")
+
+cat("Instrumen yang dianalisis terdiri dari", summary_report$data_info$n_items, "item dengan skala Likert\n")
+cat(summary_report$data_info$scale_range, "yang diujikan kepada", summary_report$data_info$n_respondents, "responden.\n\n")
+
+cat(make_line("-"), "\n\n\n")
+
+cat(make_line("="), "\n")
+cat("                     BAGIAN I: DESKRIPSI DATA DAN ASUMSI                       \n")
 cat(make_line("="), "\n\n")
 
 # 1. INFORMASI DATA
@@ -2450,16 +2491,95 @@ for (strength in strengths) {
   cat(strength, "\n")
 }
 
-cat("\n")
+cat("\n\n")
 cat(make_line("="), "\n")
-cat("AKHIR RESUME HASIL ANALISIS\n")
+cat("                               PENUTUP                                          \n")
+cat(make_line("="), "\n\n")
+
+# Kesimpulan Akhir
+cat("KESIMPULAN AKHIR:\n\n")
+
+cat("Berdasarkan analisis komprehensif yang telah dilakukan, instrumen pengukuran\n")
+cat("ini menunjukkan karakteristik psikometrik yang dapat dievaluasi dari berbagai\n")
+cat("aspek Item Response Theory. Hasil analisis memberikan informasi penting tentang\n")
+cat("kualitas item, reliabilitas pengukuran, dan informasi yang diberikan instrumen\n")
+cat("pada berbagai tingkat trait yang diukur.\n\n")
+
+# Implikasi Praktis
+cat(make_line("-"), "\n")
+cat("IMPLIKASI PRAKTIS:\n")
+cat(make_line("-"), "\n\n")
+
+cat("1. UNTUK PENGEMBANGAN INSTRUMEN:\n")
+cat("   - Item dengan diskriminasi rendah (a < 0.5) perlu direvisi atau diganti\n")
+cat("   - Item misfit menunjukkan pola respons yang tidak konsisten dengan model\n")
+cat("   - Pertimbangkan penambahan item untuk meningkatkan reliabilitas\n\n")
+
+cat("2. UNTUK PENGGUNAAN PRAKTIS:\n")
+cat("   - Instrumen paling informatif pada rentang theta tertentu\n")
+cat("   - Gunakan norma T-Score dan Percentile untuk interpretasi skor\n")
+cat("   - Pertimbangkan Conditional SEM untuk estimasi presisi pengukuran\n\n")
+
+cat("3. UNTUK PENELITIAN LANJUTAN:\n")
+cat("   - Validasi hasil dengan sampel yang berbeda\n")
+cat("   - Evaluasi invariansi pengukuran antar kelompok\n")
+cat("   - Pertimbangkan analisis Differential Item Functioning (DIF)\n\n")
+
+# Keterbatasan
+cat(make_line("-"), "\n")
+cat("KETERBATASAN STUDI:\n")
+cat(make_line("-"), "\n\n")
+
+cat("1. Ukuran sampel dan representativitas perlu dipertimbangkan\n")
+cat("2. Asumsi unidimensionalitas dan local independence perlu dipenuhi\n")
+cat("3. Model GRM mengasumsikan ordered categories yang konsisten\n")
+cat("4. Hasil berlaku untuk populasi dengan karakteristik serupa dengan sampel\n\n")
+
+# Referensi Teoritis
+cat(make_line("-"), "\n")
+cat("REFERENSI TEORITIS:\n")
+cat(make_line("-"), "\n\n")
+
+cat("Analisis ini mengacu pada prinsip-prinsip Item Response Theory (IRT):\n\n")
+cat("- Samejima, F. (1969). Estimation of latent ability using a response pattern\n")
+cat("  of graded scores. Psychometrika Monograph Supplement.\n\n")
+cat("- Embretson, S. E., & Reise, S. P. (2000). Item Response Theory for\n")
+cat("  Psychologists. Lawrence Erlbaum Associates.\n\n")
+cat("- Chalmers, R. P. (2012). mirt: A Multidimensional Item Response Theory\n")
+cat("  Package for the R Environment. Journal of Statistical Software.\n\n")
+
+# Informasi Tambahan
 cat(make_line("="), "\n")
-cat("\nCatatan:\n")
-cat("- Untuk detail lengkap, lihat file CSV dan plot yang tersedia\n")
-cat("- File laporan HTML tersedia untuk visualisasi interaktif\n")
-cat("- Semua hasil tersimpan di direktori:", OUTPUT_DIR, "\n")
+cat("INFORMASI TAMBAHAN\n")
+cat(make_line("="), "\n\n")
+
+cat("Dokumentasi Lengkap:\n")
+cat("- Laporan lengkap tersedia dalam format HTML interaktif\n")
+cat("- Data numerik tersimpan dalam file CSV di folder output\n")
+cat("- Visualisasi tersimpan sebagai file PNG beresolusi tinggi (300 DPI)\n\n")
+
+cat("Lokasi File Output:\n")
+cat("- Direktori        :", OUTPUT_DIR, "\n")
+cat("- Plot             :", PLOT_DIR, "\n")
+cat("- File CSV         : Lihat file bernomor 01-20_*.csv\n")
+cat("- Laporan HTML     : laporan_analisis_psikometrik.html\n\n")
+
+cat(make_line("="), "\n")
+cat(make_line("="), "\n")
+cat("                        AKHIR LAPORAN HASIL ANALISIS                            \n")
+cat("                    Program Studi Psikologi - UMB                               \n")
+cat("                      Psikometrika Lanjut - 2024                                \n")
+cat(make_line("="), "\n")
+cat(make_line("="), "\n\n")
+
+cat("Laporan dibuat otomatis pada:", format(Sys.time(), "%d %B %Y, %H:%M:%S WIB"), "\n")
+cat("Disusun menggunakan: R Programming Language & mirt package\n")
 cat("\n")
-cat("Timestamp:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+cat("Untuk pertanyaan lebih lanjut, hubungi dosen pengampu:\n")
+cat("Isman Rahmani Yusron, M.A\n")
+cat("Program Studi Psikologi\n")
+cat("Universitas Muhammadiyah Bandung\n")
+cat("\n")
 
 sink()
 
@@ -2476,35 +2596,113 @@ cat("=" , rep("=", 70), "\n", sep = "")
 
 # Buat file RMarkdown untuk laporan
 rmd_content <- '---
-title: "Laporan Analisis Properti Psikometrik"
-subtitle: "Pendekatan Item Response Theory - Graded Response Model"
-author: "Analisis Otomatis"
+title: "LAPORAN ANALISIS PROPERTI PSIKOMETRIK INSTRUMEN"
+subtitle: "Pendekatan Item Response Theory - Graded Response Model (IRT-GRM)"
+author: |
+  | **Program Studi Psikologi**
+  | Universitas Muhammadiyah Bandung
+  |
+  | Mata Kuliah: Psikometrika Lanjut
+  | Dosen Pengampu: Isman Rahmani Yusron, M.A
 date: "`r format(Sys.Date(), \'%d %B %Y\')`"
 output:
   html_document:
     toc: true
-    toc_float: true
-    toc_depth: 3
-    theme: flatly
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    toc_depth: 4
+    theme: cosmo
     highlight: tango
     code_folding: hide
     df_print: paged
+    number_sections: true
+    css: |
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.6;
+      }
+      h1, h2, h3 {
+        color: #2C3E50;
+      }
+      .main-container {
+        max-width: 1400px;
+      }
+      .alert {
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+      }
+      .alert-info {
+        background-color: #D9EDF7;
+        border-left: 5px solid #31708F;
+      }
+      .alert-success {
+        background-color: #DFF0D8;
+        border-left: 5px solid #3C763D;
+      }
+      .alert-warning {
+        background-color: #FCF8E3;
+        border-left: 5px solid #8A6D3B;
+      }
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
-                      fig.width = 10, fig.height = 8)
+                      fig.width = 12, fig.height = 8, dpi = 300)
 library(knitr)
 library(kableExtra)
+library(ggplot2)
+library(dplyr)
 ```
 
-# Ringkasan Eksekutif
-
-```{r}
+```{r load-data}
 summary_report <- readRDS("20_summary_report.rds")
 ```
 
-Analisis properti psikometrik telah dilakukan terhadap instrumen dengan **`r summary_report$data_info$n_items` item** dan **`r summary_report$data_info$n_respondents` responden** menggunakan pendekatan **Graded Response Model (GRM)**.
+<div class="alert alert-info">
+<h3 style="margin-top:0">📋 Tentang Laporan Ini</h3>
+Laporan ini merupakan hasil analisis komprehensif terhadap properti psikometrik instrumen pengukuran menggunakan pendekatan **Item Response Theory (IRT)** dengan **Graded Response Model (GRM)**. Analisis dilakukan sebagai bagian dari tugas mata kuliah Psikometrika Lanjut di Program Studi Psikologi, Universitas Muhammadiyah Bandung.
+</div>
+
+---
+
+# Ringkasan Eksekutif
+
+## Gambaran Umum
+
+Analisis properti psikometrik telah dilakukan terhadap instrumen pengukuran psikologis dengan karakteristik sebagai berikut:
+
+- **Jumlah Item**: `r summary_report$data_info$n_items` item
+- **Jumlah Responden**: `r summary_report$data_info$n_respondents` responden
+- **Skala Pengukuran**: Skala Likert `r summary_report$data_info$scale_range`
+- **Metode Analisis**: Item Response Theory (IRT)
+- **Model IRT**: Graded Response Model (GRM)
+
+## Highlight Hasil Utama
+
+<div class="alert alert-success">
+<h4>✅ Kualitas Unidimensionalitas</h4>
+<strong>Status:</strong> `r summary_report$unidimensionality$conclusion`<br>
+<strong>CFI:</strong> `r summary_report$unidimensionality$cfa_cfi` |
+<strong>RMSEA:</strong> `r summary_report$unidimensionality$cfa_rmsea`<br>
+<strong>Interpretasi:</strong> `r if(summary_report$unidimensionality$conclusion == "Terpenuhi") "Instrumen mengukur satu konstruk laten (unidimensional)" else "Perlu evaluasi lebih lanjut"`
+</div>
+
+<div class="alert alert-`r if(summary_report$reliability$omega_total >= 0.80) "success" else if(summary_report$reliability$omega_total >= 0.70) "warning" else "danger"`">
+<h4>`r if(summary_report$reliability$omega_total >= 0.80) "✅" else if(summary_report$reliability$omega_total >= 0.70) "⚠️" else "❌"` Reliabilitas Instrumen</h4>
+<strong>Omega Total (ω):</strong> `r summary_report$reliability$omega_total`<br>
+<strong>Kategori:</strong> `r summary_report$reliability$interpretation`<br>
+<strong>Interpretasi:</strong> `r if(summary_report$reliability$omega_total >= 0.80) "Reliabilitas sangat baik - instrumen memberikan pengukuran yang konsisten" else if(summary_report$reliability$omega_total >= 0.70) "Reliabilitas dapat diterima - masih ada ruang untuk perbaikan" else "Reliabilitas kurang memadai - perlu perbaikan signifikan"`
+</div>
+
+<div class="alert alert-info">
+<h4>📊 Karakteristik Pengukuran</h4>
+<strong>Informasi Maksimum:</strong> `r summary_report$test_info$max_information` pada θ = `r summary_report$test_info$theta_at_max`<br>
+<strong>Interpretasi:</strong> Instrumen paling presisi mengukur responden dengan tingkat trait sekitar `r summary_report$test_info$theta_at_max` (skala standar). Semakin tinggi informasi, semakin presisi pengukuran.
+</div>
+
+---
 
 ### Temuan Utama:
 
