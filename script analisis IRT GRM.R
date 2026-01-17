@@ -44,9 +44,7 @@ required_packages <- c(
 )
 
 # Install packages
-cat("=" , rep("=", 70), "\n", sep = "")
-cat("PERSIAPAN ENVIRONMENT\n")
-cat("=" , rep("=", 70), "\n", sep = "")
+print_section_header("PERSIAPAN ENVIRONMENT")
 cat("\nMemeriksa dan menginstall package yang diperlukan...\n\n")
 install_if_missing(required_packages)
 
@@ -120,12 +118,88 @@ options(device = function(...) png(filename = tempfile(), ...))
 pdf(NULL)  # Disable default PDF device
 
 # -----------------------------------------------------------------------------
+# CONSTANTS DAN THRESHOLDS ANALISIS
+# -----------------------------------------------------------------------------
+
+# Thresholds untuk interpretasi
+THETA_LIMITS <- c(-4, 4)
+THETA_STEP <- 0.1
+
+# Cutoffs untuk evaluasi item
+CUTOFF_ITEM_TOTAL_COR <- 0.30
+CUTOFF_EFA_LOADING <- 0.40
+CUTOFF_CFA_LOADING <- 0.50
+
+# Parameter diskriminasi
+DISCRIM_BREAKPOINTS <- c(0.5, 0.9, 1.3, 1.7)
+DISCRIM_LABELS <- c("Sangat Rendah", "Rendah", "Sedang", "Tinggi", "Sangat Tinggi")
+
+# Section separator
+SECTION_SEPARATOR_WIDTH <- 70
+SECTION_SEPARATOR_CHAR <- "="
+
+# Precision untuk rounding
+PRECISION_CORRELATION <- 3
+PRECISION_PERCENTAGE <- 2
+PRECISION_PARAMETER <- 3
+
+# -----------------------------------------------------------------------------
+# HELPER FUNCTIONS
+# -----------------------------------------------------------------------------
+
+# Helper untuk print section headers (digunakan 40+ kali)
+print_section_header <- function(title, width = SECTION_SEPARATOR_WIDTH,
+                                 char = SECTION_SEPARATOR_CHAR) {
+  separator <- paste(rep(char, width), collapse = "")
+  cat(separator, "\n", sep = "")
+  cat(title, "\n")
+  cat(separator, "\n", sep = "")
+}
+
+# Helper untuk save ggplot plots (digunakan 38+ kali)
+save_ggplot <- function(plot_obj, filename, plot_num = NULL,
+                       width = PLOT_WIDTH, height = PLOT_HEIGHT,
+                       dpi = PLOT_DPI, scale = 1) {
+  full_path <- paste0(PLOT_DIR, "/", filename)
+  ggsave(full_path, plot_obj,
+         width = width * scale, height = height * scale, dpi = dpi)
+
+  if (!is.null(plot_num)) {
+    cat(sprintf("Plot %d tersimpan: %s\n", plot_num, filename))
+  } else {
+    cat(sprintf("Plot tersimpan: %s\n", filename))
+  }
+}
+
+# Helper untuk save base R plots dengan print() eksplisit
+save_base_plot <- function(filename, plot_expr, plot_num = NULL,
+                          width = PLOT_WIDTH, height = PLOT_HEIGHT,
+                          dpi = PLOT_DPI, scale = 1) {
+  full_path <- paste0(PLOT_DIR, "/", filename)
+  png(full_path, width = width * scale, height = height * scale,
+      units = "in", res = dpi)
+  print(plot_expr)
+  dev.off()
+
+  if (!is.null(plot_num)) {
+    cat(sprintf("Plot %d tersimpan: %s\n", plot_num, filename))
+  } else {
+    cat(sprintf("Plot tersimpan: %s\n", filename))
+  }
+}
+
+# Helper untuk kategorisasi diskriminasi
+categorize_discrimination <- function(values) {
+  cut(values,
+      breaks = c(-Inf, DISCRIM_BREAKPOINTS, Inf),
+      labels = DISCRIM_LABELS)
+}
+
+# -----------------------------------------------------------------------------
 # 3. IMPORT DAN PERSIAPAN DATA
 # -----------------------------------------------------------------------------
 
-cat("=" , rep("=", 70), "\n", sep = "")
-cat("IMPORT DAN PERSIAPAN DATA\n")
-cat("=" , rep("=", 70), "\n", sep = "")
+print_section_header("IMPORT DAN PERSIAPAN DATA")
 
 # Import data
 cat(paste0("\nMembaca data dari: ", DATA_FILE, "\n"))
@@ -243,9 +317,7 @@ p1 <- ggplot(data.frame(Score = total_scores), aes(x = Score)) +
            label = paste0("M = ", round(mean(total_scores), 2)),
            vjust = 2, hjust = -0.1, color = "red")
 
-ggsave(paste0(PLOT_DIR, "/01_distribusi_skor_total.png"), p1,
-       width = PLOT_WIDTH, height = PLOT_HEIGHT, dpi = PLOT_DPI)
-cat("\nPlot 1 tersimpan: 01_distribusi_skor_total.png\n")
+save_ggplot(p1, "01_distribusi_skor_total.png", plot_num = 1)
 
 # --- PLOT 2: Boxplot Item ---
 item_long <- item_data %>%
@@ -267,9 +339,7 @@ p2 <- ggplot(item_long, aes(x = Item, y = Response, fill = Item)) +
         legend.position = "none") +
   scale_y_continuous(breaks = MIN_SCALE:MAX_SCALE)
 
-ggsave(paste0(PLOT_DIR, "/02_boxplot_item.png"), p2,
-       width = PLOT_WIDTH, height = PLOT_HEIGHT, dpi = PLOT_DPI)
-cat("Plot 2 tersimpan: 02_boxplot_item.png\n")
+save_ggplot(p2, "02_boxplot_item.png", plot_num = 2)
 
 # --- PLOT 3: Mean per Item dengan Error Bar ---
 p3 <- ggplot(desc_stats, aes(x = reorder(Item, Mean), y = Mean)) +
@@ -287,9 +357,7 @@ p3 <- ggplot(desc_stats, aes(x = reorder(Item, Mean), y = Mean)) +
   theme_report() +
   scale_y_continuous(limits = c(0, 5.5), breaks = 0:5)
 
-ggsave(paste0(PLOT_DIR, "/03_mean_item_errorbar.png"), p3,
-       width = PLOT_WIDTH, height = PLOT_HEIGHT, dpi = PLOT_DPI)
-cat("Plot 3 tersimpan: 03_mean_item_errorbar.png\n")
+save_ggplot(p3, "03_mean_item_errorbar.png", plot_num = 3)
 
 # --- PLOT 4: Heatmap Distribusi Kategori ---
 prop_long <- prop_df %>%
