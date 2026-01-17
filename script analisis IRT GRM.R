@@ -869,9 +869,10 @@ theta_range <- seq(-4, 4, by = 0.1)
 # --- PLOT 14: ICC Grid (semua item) ---
 png(paste0(PLOT_DIR, "/14_icc_all_items.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "trace", which.items = 1:n_items,
+p <- plot(grm_model, type = "trace", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Item Characteristic Curves (ICC) - All Items")
+print(p)
 dev.off()
 cat("\nPlot 14 tersimpan: 14_icc_all_items.png\n")
 
@@ -879,9 +880,10 @@ cat("\nPlot 14 tersimpan: 14_icc_all_items.png\n")
 for (i in 1:n_items) {
   png(paste0(PLOT_DIR, "/14_icc_item_", i, ".png"),
       width = PLOT_WIDTH, height = PLOT_HEIGHT, units = "in", res = PLOT_DPI)
-  plot(grm_model, type = "trace", which.items = i,
+  p <- plot(grm_model, type = "trace", which.items = i,
        theta_lim = c(-4, 4),
        main = paste0("ICC - ", item_names[i]))
+  print(p)
   dev.off()
 }
 cat(paste0("Plot ICC individual tersimpan: 14_icc_item_1.png sampai 14_icc_item_", n_items, ".png\n"))
@@ -889,9 +891,10 @@ cat(paste0("Plot ICC individual tersimpan: 14_icc_item_1.png sampai 14_icc_item_
 # --- PLOT 15: Category Response Curves ---
 png(paste0(PLOT_DIR, "/15_category_response_curves.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "trace", which.items = 1:min(6, n_items),
+p <- plot(grm_model, type = "trace", which.items = 1:min(6, n_items),
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Category Response Curves (6 Item Pertama)")
+print(p)
 dev.off()
 cat("Plot 15 tersimpan: 15_category_response_curves.png\n")
 
@@ -959,9 +962,10 @@ cat("\nPlot 16 tersimpan: 16_iif_all_items.png\n")
 # --- PLOT 17: IIF Individual ---
 png(paste0(PLOT_DIR, "/17_iif_individual.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "infotrace", which.items = 1:n_items,
+p <- plot(grm_model, type = "infotrace", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Item Information Functions (Individual)")
+print(p)
 dev.off()
 cat("Plot 17 tersimpan: 17_iif_individual.png\n")
 
@@ -1687,17 +1691,19 @@ cat("=" , rep("=", 70), "\n", sep = "")
 # --- PLOT 26: Expected Score Curve (Test) ---
 png(paste0(PLOT_DIR, "/26_expected_score_curve.png"),
     width = PLOT_WIDTH, height = PLOT_HEIGHT, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "score", theta_lim = c(-4, 4),
+p <- plot(grm_model, type = "score", theta_lim = c(-4, 4),
      main = "Test Expected Score Curve")
+print(p)
 dev.off()
 cat("\nPlot 26 tersimpan: 26_expected_score_curve.png\n")
 
 # --- PLOT 27: Expected Score per Item ---
 png(paste0(PLOT_DIR, "/27_expected_score_items.png"),
     width = PLOT_WIDTH * 1.5, height = PLOT_HEIGHT * 1.5, units = "in", res = PLOT_DPI)
-plot(grm_model, type = "itemscore", which.items = 1:n_items,
+p <- plot(grm_model, type = "itemscore", which.items = 1:n_items,
      theta_lim = c(-4, 4), facet_items = TRUE,
      main = "Expected Score per Item")
+print(p)
 dev.off()
 cat("Plot 27 tersimpan: 27_expected_score_items.png\n")
 
