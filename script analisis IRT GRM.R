@@ -43,80 +43,6 @@ required_packages <- c(
   "rmarkdown"   # Generate report
 )
 
-# Install packages
-print_section_header("PERSIAPAN ENVIRONMENT")
-cat("\nMemeriksa dan menginstall package yang diperlukan...\n\n")
-install_if_missing(required_packages)
-
-# Load packages
-suppressPackageStartupMessages({
-  library(mirt)
-  library(psych)
-  library(lavaan)
-  library(ggplot2)
-  library(dplyr)
-  library(tidyr)
-  library(gridExtra)
-  library(corrplot)
-  library(knitr)
-  library(kableExtra)
-  library(RColorBrewer)
-  library(scales)
-  library(cowplot)
-  library(reshape2)
-  library(moments)
-  library(rmarkdown)
-})
-
-cat("Semua package berhasil dimuat!\n\n")
-
-# -----------------------------------------------------------------------------
-# 2. KONFIGURASI DAN PARAMETER
-# -----------------------------------------------------------------------------
-
-# Konfigurasi file
-DATA_FILE <- "data_skala.csv"
-OUTPUT_DIR <- "output_analisis_psikometrik"
-PLOT_DIR <- paste0(OUTPUT_DIR, "/plots")
-
-# Buat direktori output
-if (!dir.exists(OUTPUT_DIR)) dir.create(OUTPUT_DIR, recursive = TRUE)
-if (!dir.exists(PLOT_DIR)) dir.create(PLOT_DIR, recursive = TRUE)
-
-# Konfigurasi skala
-MIN_SCALE <- 1
-MAX_SCALE <- 5
-SCALE_LABELS <- c("Sangat Tidak Sesuai", "Tidak Sesuai", "Netral",
-                  "Sesuai", "Sangat Sesuai")
-
-# Konfigurasi plot
-PLOT_WIDTH <- 10
-PLOT_HEIGHT <- 8
-PLOT_DPI <- 300
-
-# Theme untuk ggplot
-theme_report <- function() {
-  theme_minimal() +
-    theme(
-      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-      plot.subtitle = element_text(size = 11, hjust = 0.5, color = "gray40"),
-      axis.title = element_text(size = 11),
-      axis.text = element_text(size = 10),
-      legend.title = element_text(size = 10, face = "bold"),
-      legend.text = element_text(size = 9),
-      panel.grid.minor = element_blank(),
-      strip.text = element_text(size = 11, face = "bold")
-    )
-}
-
-# Palet warna
-colors_main <- brewer.pal(8, "Set2")
-colors_gradient <- colorRampPalette(c("#3498db", "#e74c3c"))(5)
-
-# Konfigurasi grafis - mencegah plot ke device default
-options(device = function(...) png(filename = tempfile(), ...))
-pdf(NULL)  # Disable default PDF device
-
 # -----------------------------------------------------------------------------
 # CONSTANTS DAN THRESHOLDS ANALISIS
 # -----------------------------------------------------------------------------
@@ -194,6 +120,80 @@ categorize_discrimination <- function(values) {
       breaks = c(-Inf, DISCRIM_BREAKPOINTS, Inf),
       labels = DISCRIM_LABELS)
 }
+
+# Install packages
+print_section_header("PERSIAPAN ENVIRONMENT")
+cat("\nMemeriksa dan menginstall package yang diperlukan...\n\n")
+install_if_missing(required_packages)
+
+# Load packages
+suppressPackageStartupMessages({
+  library(mirt)
+  library(psych)
+  library(lavaan)
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(gridExtra)
+  library(corrplot)
+  library(knitr)
+  library(kableExtra)
+  library(RColorBrewer)
+  library(scales)
+  library(cowplot)
+  library(reshape2)
+  library(moments)
+  library(rmarkdown)
+})
+
+cat("Semua package berhasil dimuat!\n\n")
+
+# -----------------------------------------------------------------------------
+# 2. KONFIGURASI DAN PARAMETER
+# -----------------------------------------------------------------------------
+
+# Konfigurasi file
+DATA_FILE <- "data_skala.csv"
+OUTPUT_DIR <- "output_analisis_psikometrik"
+PLOT_DIR <- paste0(OUTPUT_DIR, "/plots")
+
+# Buat direktori output
+if (!dir.exists(OUTPUT_DIR)) dir.create(OUTPUT_DIR, recursive = TRUE)
+if (!dir.exists(PLOT_DIR)) dir.create(PLOT_DIR, recursive = TRUE)
+
+# Konfigurasi skala
+MIN_SCALE <- 1
+MAX_SCALE <- 5
+SCALE_LABELS <- c("Sangat Tidak Sesuai", "Tidak Sesuai", "Netral",
+                  "Sesuai", "Sangat Sesuai")
+
+# Konfigurasi plot
+PLOT_WIDTH <- 10
+PLOT_HEIGHT <- 8
+PLOT_DPI <- 300
+
+# Theme untuk ggplot
+theme_report <- function() {
+  theme_minimal() +
+    theme(
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(size = 11, hjust = 0.5, color = "gray40"),
+      axis.title = element_text(size = 11),
+      axis.text = element_text(size = 10),
+      legend.title = element_text(size = 10, face = "bold"),
+      legend.text = element_text(size = 9),
+      panel.grid.minor = element_blank(),
+      strip.text = element_text(size = 11, face = "bold")
+    )
+}
+
+# Palet warna
+colors_main <- brewer.pal(8, "Set2")
+colors_gradient <- colorRampPalette(c("#3498db", "#e74c3c"))(5)
+
+# Konfigurasi grafis - mencegah plot ke device default
+options(device = function(...) png(filename = tempfile(), ...))
+pdf(NULL)  # Disable default PDF device
 
 # -----------------------------------------------------------------------------
 # 3. IMPORT DAN PERSIAPAN DATA
